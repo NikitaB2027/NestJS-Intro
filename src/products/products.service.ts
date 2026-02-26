@@ -15,10 +15,11 @@ export class ProductsService {
         title,
         description: desc, 
         price});
-    await newProduct.save();
-    return prodId;
+    const result =await newProduct.save();
+    console.log(result);
+    return 'prodId';
    }
-   //ajasaaasdlgaskndjg
+   
 
    getProducts(){
     return [...this.products];
