@@ -17,22 +17,28 @@ export class ProductsService {
         price});
     const result =await newProduct.save();
     console.log(result);
-    return 'prodId';
+    return result.id as string;
    }
-   //I'm stuck on the console part
+   
    
 
-   getProducts(){
-    return [...this.products];
+   async getProducts(){
+    const products= await this.productModel.find().exec();
+    return products.map((prod)=>({
+        id: prod.id, 
+        title: prod.title, 
+        description: prod.description, 
+        price: prod.price
+    }));
    }
 
-   getSingleProduct(productId: string){
-    const product = this.findProduct(productId)[0];
-    return {...product};
+   async getSingleProduct(productId: string){
+    const product = await this.findProduct(productId);
+    return product;
    }
 
    updateProduct(productId: string, title: string, desc: string, price:number){
-    const [product, index] = this.findProduct(productId);
+    /*const [product, index] = this.findProduct(productId);
     const updatedProduct = {...product};
     if(title){
         updatedProduct.title= title;
@@ -44,7 +50,7 @@ export class ProductsService {
         updatedProduct.price= price;
     }
     this.products[index]= updatedProduct;
-
+*/
    }
 
    deleteProduct(prodId: string){
@@ -52,13 +58,22 @@ export class ProductsService {
     this.products.splice(index, 1);
    }
 
-   private findProduct(id:string): [Product, number]{
-    const productIndex = this.products.findIndex((prod)=> prod.id=== id);
-    const product=this.products[productIndex];
+   private async findProduct(id:string): Promise<Product>{
+    let product;
+    try{
+        const product= await this.productModel.findById(id);
+    } catch (error) {
+        throw new NotFoundException('Could not find product.')
+    }
     if(!product){
         throw new NotFoundException('Could not find product');
     }
-    return [product, productIndex];
+    return {
+        id: product.id, 
+        title: product.title, 
+        description: product.description, 
+        price: product.price
+    };
    }
 
    
