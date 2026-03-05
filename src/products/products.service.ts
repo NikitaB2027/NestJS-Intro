@@ -34,10 +34,20 @@ export class ProductsService {
 
    async getSingleProduct(productId: string){
     const product = await this.findProduct(productId);
-    return product;
+    return {
+        id: product.id, 
+        title: product.title, 
+        description: product.description, 
+        price: product.price
+    };
    }
 
-   async updateProduct(productId: string, title: string, desc: string, price:number){
+   async updateProduct(
+    productId: string, 
+    title: string, 
+    desc: string, 
+    price:number
+){
     const updatedProduct=await this.findProduct(productId);
     if(title){
         updatedProduct.title= title;
@@ -51,9 +61,9 @@ export class ProductsService {
     updatedProduct.save();
    }
 
-   deleteProduct(prodId: string){
-    const index=this.findProduct(prodId)[1];
-    this.products.splice(index, 1);
+   async deleteProduct(prodId: string){
+    const result =await this.productModel.deleteOne({_id: prodId}).exec();
+    console.log(result);
    }
 
    private async findProduct(id:string): Promise<Product>{
